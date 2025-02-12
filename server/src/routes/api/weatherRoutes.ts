@@ -48,8 +48,9 @@ router.post('/',async (req: Request, res:Response) => {
         })
         .catch(error => {
             console.error('Error fetching weather data:', error);
-            document.getElementById('weather').innerHTML = `<p>${error.message}</p>`;
+            document.getElementById('weather')?.innerHTML = `<p>${error.message}</p>`;
         });
+        const temp = document.getElementById('weather') if (temp) { temp.innerHTML = `&lt;p&gt;${error.message}&lt;/p&gt;`; }
 });
   // TODO: save city to search history
 

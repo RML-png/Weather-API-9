@@ -1,21 +1,20 @@
-import { Router } from 'express';
+import { Router, type Request, type Response } from 'express';
 const router = Router();
 
 import HistoryService from '../../service/historyService.js';
 import WeatherService from '../../service/weatherService.js';
 
-// dODO: POST Request with city name to retrieve weather data
-router.post('/', (req, res) => {
-  router.get('/:city', async (req: Request, res: Response) => {
+// : POST Request with city name to retrieve weather data
+router.post('/',async (req: Request, res:Response) => {
+  
     try {
-      const stateName = req.params.city;
-      const cityCode = await WeatherService.convertCityNameToCode(cityName);
-      const weather = await WeatherService.getParksByState(cityCode);
+      const cityName = req.body.cityName;
+      
+      
       //ensures saved data has proper casing regardless of input
-      const sanitizedCityName = await WeatherService.convertCityCodeToName(
-        cityCodeCode
-      );
-      await HistoryService.addCity(sanitizedCityName);
+      const weather=await WeatherService.getWeatherForCity(cityName)
+  
+      await HistoryService.addCity(cityName);
       res.json(weather);
     } catch (err) {
       console.log(err);
@@ -23,27 +22,41 @@ router.post('/', (req, res) => {
     }
   });
   // dODO: GET weather data from city name
-  router.get('/events/:city', async (req: Request, res: Response) => {
-    try {
-      const city = req.params.state;
-      const cityCode = await WeatherService.convertCityNameToCode(city);
-      const events = await WeatherService.getClosestEventByState(cityCode);
-      if (typeof events === 'string') {
-        res.status(404).json({ message: 'No events found' });
-      } else {
-        res.json(events);
-      }
-    } catch (err) {
-      console.log(err);
-      res.status(500).json(err);
-    }
-  }); 
-  // TODO: save city to search history
+  document.getElementById('weather').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const cityName = document.getElementById('cityName').value; // Get the city name from the input
+
+    // Fetch weather data for the city
+    fetch(`WeatherService${cityName}&appid=Key&units=metric`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('City not found');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Process and display the weather data
+            const weatherOutput = document.getElementById('weather-output');
+            weatherOutput.innerHTML = `
+                <h2>Weather in ${data.name}</h2>
+                <p>Temperature: ${data.main.temp} °C</p>
+                <p>Weather: ${data.weather[0].description}</p>
+                <p>Humidity: ${data.main.humidity}%</p>
+                <p>Wind Speed: ${data.wind.speed} m/s</p>
+            `;
+        })
+        .catch(error => {
+            console.error('Error fetching weather data:', error);
+            document.getElementById('weather').innerHTML = `<p>${error.message}</p>`;
+        });
 });
+  // TODO: save city to search history
+
 
 // dODO: GET search history
-router.get('/history', async (req, res) => {});
-router.get('/', async (_req: Request, res: Response) => {
+router.get('/history', async (_req: Request, res: Response) => {
+
   try {
     const savedCities = await HistoryService.getCities();
     res.json(savedCities);
@@ -53,13 +66,13 @@ router.get('/', async (_req: Request, res: Response) => {
   }
 });
 // * BONUS dODO: DELETE city from search history
-router.delete('/history/:id', async (req, res) => {});
-router.delete('/:id', async (req: Request, res: Response) => {
+router.delete('/history/:id', async (req, res) => {
+
   try {
     if (!req.params.id) {
       res.status(400).json({ msg: 'City id is required' });
     }
-    await historyService.removeCity(req.params.id);
+    await HistoryService.removeCity(req.params.id);
     res.json({ success: 'City successfully removed from search history' });
   } catch (err) {
     console.log(err);

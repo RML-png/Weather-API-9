@@ -22,10 +22,10 @@ router.post('/',async (req: Request, res:Response) => {
     }
   });
   // dODO: GET weather data from city name
-  document.getElementById('weather').addEventListener('submit', function(event) {
+  document.getElementById('weather')?.addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent the default form submission
 
-    const cityName = document.getElementById('cityName').value; // Get the city name from the input
+    const cityName = document.getElementById('cityName')?.value; // Get the city name from the input
 
     // Fetch weather data for the city
     fetch(`WeatherService${cityName}&appid=Key&units=metric`)
@@ -37,7 +37,7 @@ router.post('/',async (req: Request, res:Response) => {
         })
         .then(data => {
             // Process and display the weather data
-            const weatherOutput = document.getElementById('weather-output');
+            const weatherOutput = document.getElementById('weather');
             weatherOutput.innerHTML = `
                 <h2>Weather in ${data.name}</h2>
                 <p>Temperature: ${data.main.temp} °C</p>
